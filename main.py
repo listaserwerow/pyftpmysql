@@ -16,11 +16,14 @@ def main():
                 database="hosting",
                 user="hosting",
                 password="hosting"
+            ), ftp=dict(
+                port=21
             )), yaml_file)
 
     with open("config.yml", 'r') as yaml_file:
         config = yaml.full_load(yaml_file)
 
+    ftp = config["ftp"]
     database = pymysql.connect(**config["mysql"], charset="utf8mb4", cursorclass=pymysql.cursors.DictCursor,
                                autocommit=True)
     cursor = database.cursor()
@@ -33,7 +36,7 @@ def main():
     handler = FTPHandler
     handler.banner = "FTP is ready"
     handler.authorizer = authorizer
-    server = FTPServer(('', 2121), handler)
+    server = FTPServer(('', ftp["port"]), handler)
     server.serve_forever()
 
     database.close()
